@@ -24,7 +24,10 @@ def prep_telco_data(df):
     
     # drop the columns that do not appear to have any association to churn
     df = df.drop(columns=['streaming_movies', 'streaming_tv', 'multiple_lines', 'gender',
-                         'contract_type_id', 'internet_service_type_id'])
+                         'contract_type_id', 'internet_service_type_id', 'payment_type_id'])
+    
+    # rename my tenure column
+    df = df.rename(columns={'tenure': 'tenure_in_months'})
 
     # this change all of my yes and no columns to binary columns
     columns = ['partner', 'dependents', 'phone_service', 'online_security', 'online_backup', 
@@ -32,9 +35,6 @@ def prep_telco_data(df):
 
     for cols in columns:
         df[cols] = np.where(df[cols] == 'Yes', 1, 0)
-        
-    # rename my tenure column
-    df.rename(columns={'tenure': 'tenure_in_months'})
 
     return df
 
@@ -42,7 +42,7 @@ def prep_telco_data(df):
 
 def create_dummies(df):
     '''
-    This function
+    This function is used to create dummy columns for my non binary columns
     '''
     
     # create dummies for payment_type, internet_service_type, and contract_type
@@ -55,14 +55,14 @@ def create_dummies(df):
     
     # now I am dropping all my original string columns that I made dummies with and dropping 
     #the type_id columns since they are duplicates of the string column
-    df = df.drop(columns=['None', 'payment_type', 'payment_type_id', 'contract_type', 'internet_service_type'])
+    df = df.drop(columns=['None', 'payment_type', 'contract_type', 'internet_service_type'])
     
     return df
 
 
 def telco_split(df):
     '''
-    This function takes in 
+    This function takes in a dataframe and splits it into train, test, and validate dataframes for my model
     '''
 
     train_validate, test = train_test_split(df, test_size=.2, 
@@ -70,4 +70,3 @@ def telco_split(df):
     train, validate = train_test_split(train_validate, test_size=.3, 
                                    random_state=123)
     return train, validate, test
-    
